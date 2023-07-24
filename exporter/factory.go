@@ -16,11 +16,19 @@ func createDefaultConfig() component.Config {
 }
 
 func createLogsExporter(
-	_ context.Context,
+	ctx context.Context,
 	params exporter.CreateSettings,
 	baseCfg component.Config,
 ) (exporter.Logs, error) {
-	exporter := frostdbExporter{}
+	// columnstore, err := createColumnStore(ctx)
+	// if err != nil {
+	// 	return nil, err
+	// }
+
+	exporter := frostdbExporter{
+		// columnstore,
+	}
+
 	return &exporter, nil
 }
 
