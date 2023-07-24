@@ -20,13 +20,13 @@ func createLogsExporter(
 	params exporter.CreateSettings,
 	baseCfg component.Config,
 ) (exporter.Logs, error) {
-	// columnstore, err := createColumnStore(ctx)
-	// if err != nil {
-	// 	return nil, err
-	// }
+	columnstore, err := createColumnStore(ctx)
+	if err != nil {
+		return nil, err
+	}
 
 	exporter := frostdbExporter{
-		// columnstore,
+		columnstore,
 	}
 
 	return &exporter, nil

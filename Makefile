@@ -16,7 +16,7 @@ start:
 # e.g. clean this up cause it's effectivly hard-coded to how you downloaded things
 .PHONY: send-test-log
 send-test-log:
-	cat ./otel-logs-frostdb/log_messages.json | ~/go/bin/grpcurl \
+	cat log_messages.json | ~/go/bin/grpcurl \
 		-plaintext \
 		-import-path ../opentelemetry-proto/ \
 		-proto ../opentelemetry-proto/opentelemetry/proto/collector/logs/v1/logs_service.proto \

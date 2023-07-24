@@ -37,34 +37,34 @@ type Record struct {
 func (f *frostdbExporter) ConsumeLogs(ctx context.Context, logs plog.Logs) error {
 	log.Printf("log received")
 
-	// database, err := f.columnstore.DB(ctx, dbName)
-	// if err != nil {
-	// 	return err
-	// }
+	database, err := f.columnstore.DB(ctx, dbName)
+	if err != nil {
+		return err
+	}
 
-	// log.Printf("got database %v", database)
+	log.Printf("got database %v", database)
 
-	// table, err := database.GetTable(tableName)
-	// if err != nil {
-	// 	return err
-	// }
+	table, err := database.GetTable(tableName)
+	if err != nil {
+		return err
+	}
 
-	// log.Printf("got table %v", table)
+	log.Printf("got table %v", table)
 
-	// for i := 0; i < logs.ResourceLogs().Len(); i++ {
-	// 	resourceLogs := logs.ResourceLogs().At(i)
-	// 	for j := 0; j < resourceLogs.ScopeLogs().Len(); j++ {
-	// 		scopedLogs := resourceLogs.ScopeLogs().At(j)
-	// 		for k := 0; k < scopedLogs.LogRecords().Len(); k++ {
-	// 			logRecord := scopedLogs.LogRecords().At(k)
-	// 			record := Record{
-	// 				Bodystring: logRecord.Body().AsString(),
-	// 			}
+	for i := 0; i < logs.ResourceLogs().Len(); i++ {
+		resourceLogs := logs.ResourceLogs().At(i)
+		for j := 0; j < resourceLogs.ScopeLogs().Len(); j++ {
+			scopedLogs := resourceLogs.ScopeLogs().At(j)
+			for k := 0; k < scopedLogs.LogRecords().Len(); k++ {
+				logRecord := scopedLogs.LogRecords().At(k)
+				record := Record{
+					Bodystring: logRecord.Body().AsString(),
+				}
 
-	// 			table.Write(ctx, record)
-	// 		}
-	// 	}
-	// }
+				table.Write(ctx, record)
+			}
+		}
+	}
 
 	return nil
 }
