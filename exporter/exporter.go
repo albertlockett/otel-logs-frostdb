@@ -31,7 +31,9 @@ func (f *frostdbExporter) Capabilities() consumer.Capabilities {
 }
 
 type Record struct {
-	Bodystring string
+	TimeUnixNano int64
+	BodyString   string
+	// AttributesKeyvalueString map[string]string
 }
 
 func (f *frostdbExporter) ConsumeLogs(ctx context.Context, logs plog.Logs) error {
@@ -57,8 +59,11 @@ func (f *frostdbExporter) ConsumeLogs(ctx context.Context, logs plog.Logs) error
 			scopedLogs := resourceLogs.ScopeLogs().At(j)
 			for k := 0; k < scopedLogs.LogRecords().Len(); k++ {
 				logRecord := scopedLogs.LogRecords().At(k)
+				log.Printf("%v", logRecord.Body())
+
 				record := Record{
-					Bodystring: logRecord.Body().AsString(),
+					TimeUnixNano: logRecord.Timestamp().AsTime().Unix(),
+					BodyString:   logRecord.Body().AsString(),
 				}
 
 				table.Write(ctx, record)

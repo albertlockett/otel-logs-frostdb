@@ -15,6 +15,7 @@
         {
           "log_records": [
             {
+              "time_unix_nano": $ENV_TIMESTAMP,
               "body": {
                 "string_value": "hello"
               }

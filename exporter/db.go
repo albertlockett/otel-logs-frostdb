@@ -9,7 +9,7 @@ import (
 	"github.com/apache/arrow/go/v13/arrow"
 	"github.com/apache/arrow/go/v13/arrow/memory"
 	"github.com/polarsignals/frostdb"
-	schemapb "github.com/polarsignals/frostdb/gen/proto/go/frostdb/schema/v1alpha2"
+	schemapb "github.com/polarsignals/frostdb/gen/proto/go/frostdb/schema/v1alpha1"
 	"github.com/polarsignals/frostdb/query"
 	"github.com/polarsignals/frostdb/query/logicalplan"
 )
@@ -31,23 +31,19 @@ func createColumnStore(ctx context.Context) (*frostdb.ColumnStore, error) {
 		return nil, err
 	}
 
-	schema := &schemapb.Schema{
-		Root: &schemapb.Group{
-			Name: tableName,
-			Nodes: []*schemapb.Node{
-				{
-					Type: &schemapb.Node_Leaf{
-						Leaf: &schemapb.Leaf{
-							Name: "bodystring",
-							StorageLayout: &schemapb.StorageLayout{
-								Type:     schemapb.StorageLayout_TYPE_STRING,
-								Encoding: schemapb.StorageLayout_ENCODING_PLAIN_UNSPECIFIED,
-							},
-						},
-					},
-				},
-			},
+	columns := []*schemapb.Column{}
+
+	columns = append(columns, &schemapb.Column{
+		Name: "time_unix_nano",
+		StorageLayout: &schemapb.StorageLayout{
+			Type: schemapb.StorageLayout_TYPE_INT64,
 		},
+	})
+	columns = append(columns, anySchema("body")...)
+	columns = append(columns, keyValueSchema("attributes")...)
+
+	schema := &schemapb.Schema{
+		Columns: columns,
 	}
 
 	database.Table(tableName, frostdb.NewTableConfig(schema))
@@ -74,7 +70,8 @@ func startQueryPoller(columnstore *frostdb.ColumnStore) {
 			engine.ScanTable(tableName).
 				Aggregate(
 					[]logicalplan.Expr{
-						logicalplan.Count(logicalplan.Col("bodystring")),
+						logicalplan.Max(logicalplan.Col("time_unix_nano")),
+						logicalplan.Count(logicalplan.Col("body_string")),
 					},
 					[]logicalplan.Expr{},
 				).
