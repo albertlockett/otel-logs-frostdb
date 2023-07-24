@@ -25,6 +25,8 @@ func createLogsExporter(
 		return nil, err
 	}
 
+	startQueryPoller(columnstore)
+
 	exporter := frostdbExporter{
 		columnstore,
 	}

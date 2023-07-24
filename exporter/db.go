@@ -2,9 +2,16 @@ package frostdbexporter
 
 import (
 	"context"
+	"fmt"
+	"log"
+	"time"
 
+	"github.com/apache/arrow/go/v13/arrow"
+	"github.com/apache/arrow/go/v13/arrow/memory"
 	"github.com/polarsignals/frostdb"
 	schemapb "github.com/polarsignals/frostdb/gen/proto/go/frostdb/schema/v1alpha2"
+	"github.com/polarsignals/frostdb/query"
+	"github.com/polarsignals/frostdb/query/logicalplan"
 )
 
 const (
@@ -46,5 +53,36 @@ func createColumnStore(ctx context.Context) (*frostdb.ColumnStore, error) {
 	database.Table(tableName, frostdb.NewTableConfig(schema))
 
 	return columnstore, nil
+}
 
+func startQueryPoller(columnstore *frostdb.ColumnStore) {
+
+	// TODO
+	go func() {
+		for {
+			ctx := context.Background()
+			database, _ := columnstore.DB(ctx, dbName)
+			// table, _ := database.GetTable(tableName)
+
+			database.TableProvider().GetTable(tableName)
+
+			time.Sleep(1 * time.Second)
+
+			log.Println("checking how many records in db")
+
+			engine := query.NewEngine(memory.DefaultAllocator, database.TableProvider())
+			engine.ScanTable(tableName).
+				Aggregate(
+					[]logicalplan.Expr{
+						logicalplan.Count(logicalplan.Col("bodystring")),
+					},
+					[]logicalplan.Expr{},
+				).
+				Execute(ctx, func(ctx context.Context, r arrow.Record) error {
+					fmt.Println(r)
+					return nil
+				})
+
+		}
+	}()
 }
