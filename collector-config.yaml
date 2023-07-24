@@ -1,0 +1,19 @@
+receivers:
+  otlp/notls:
+    protocols:
+      grpc:
+
+processors:
+
+exporters:
+  frostdb:
+
+service:
+  pipelines:
+    logs:
+      receivers: [otlp/notls]
+      processors: []
+      exporters: [frostdb]
+  telemetry:
+    logs:
+      level: debug

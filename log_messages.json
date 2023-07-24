@@ -1,0 +1,27 @@
+{
+  "resource_logs": [
+    {
+      "resource": {
+        "attributes": [
+          {
+            "key": "attr1",
+            "value": {
+              "string_value": "value1"
+            }
+          }
+        ]
+      },
+      "scope_logs": [
+        {
+          "log_records": [
+            {
+              "body": {
+                "string_value": "hello"
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -20,8 +20,8 @@ func createLogsExporter(
 	params exporter.CreateSettings,
 	baseCfg component.Config,
 ) (exporter.Logs, error) {
-	return nil, nil
-
+	exporter := frostdbExporter{}
+	return &exporter, nil
 }
 
 func NewFactory() exporter.Factory {

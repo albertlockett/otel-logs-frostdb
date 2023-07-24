@@ -3,6 +3,7 @@
 package main
 
 import (
+	frostdbexporter "github.com/albertlockett/otel-logs-frostdb/exporter"
 	"go.opentelemetry.io/collector/connector"
 	"go.opentelemetry.io/collector/exporter"
 	"go.opentelemetry.io/collector/extension"
@@ -30,6 +31,7 @@ func components() (otelcol.Factories, error) {
 	}
 
 	factories.Exporters, err = exporter.MakeFactoryMap(
+		frostdbexporter.NewFactory(),
 	)
 	if err != nil {
 		return otelcol.Factories{}, err
