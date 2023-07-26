@@ -18,7 +18,21 @@
               "time_unix_nano": $ENV_TIMESTAMP,
               "body": {
                 "string_value": "hello"
-              }
+              },
+              "attributes": [
+                {
+                  "key": "attr1",
+                  "value": {
+                    "string_value": "value1"
+                  }
+                },
+                {
+                  "key": "attr2",
+                  "value": {
+                    "int_value": 99
+                  }
+                }
+              ]
             }
           ]
         }

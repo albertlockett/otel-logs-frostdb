@@ -3,6 +3,7 @@ package frostdbexporter
 import (
 	"context"
 
+	"github.com/albertlockett/otel-logs-frostdb/query"
 	"go.opentelemetry.io/collector/component"
 	"go.opentelemetry.io/collector/exporter"
 )
@@ -21,6 +22,11 @@ func createLogsExporter(
 	baseCfg component.Config,
 ) (exporter.Logs, error) {
 	columnstore, err := createColumnStore(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	err = query.StartQueryServer()
 	if err != nil {
 		return nil, err
 	}

@@ -1,0 +1,21 @@
+syntax = "proto3";
+
+option go_package="github.com/albertlockett/otel-logs-frostdb/query";
+
+service Query {
+  rpc GetLogs (LogsRequest) returns (LogsResponse) {}
+}
+
+message LogsRequest {
+
+}
+
+message LogsResponse {
+  repeated Log logs = 1;
+}
+
+message Log {
+  fixed64 time_unix_nano = 1;
+
+  string body = 2; // TODO get rid of this
+}
