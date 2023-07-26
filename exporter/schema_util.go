@@ -14,18 +14,21 @@ func anySchemaInternal(fieldName string, dynamic bool) []*schemapb.Column {
 			StorageLayout: &schemapb.StorageLayout{
 				Type: schemapb.StorageLayout_TYPE_STRING,
 			},
+			Dynamic: dynamic,
 		},
 		{
 			Name: fmt.Sprintf("%s_bool", fieldName),
 			StorageLayout: &schemapb.StorageLayout{
 				Type: schemapb.StorageLayout_TYPE_BOOL,
 			},
+			Dynamic: dynamic,
 		},
 		{
 			Name: fmt.Sprintf("%s_int", fieldName),
 			StorageLayout: &schemapb.StorageLayout{
 				Type: schemapb.StorageLayout_TYPE_INT64,
 			},
+			Dynamic: dynamic,
 		},
 	}
 }

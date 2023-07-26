@@ -11,7 +11,6 @@ import (
 	"github.com/polarsignals/frostdb"
 	schemapb "github.com/polarsignals/frostdb/gen/proto/go/frostdb/schema/v1alpha1"
 	"github.com/polarsignals/frostdb/query"
-	"github.com/polarsignals/frostdb/query/logicalplan"
 )
 
 const (
@@ -64,17 +63,17 @@ func startQueryPoller(columnstore *frostdb.ColumnStore) {
 
 			time.Sleep(1 * time.Second)
 
-			log.Println("checking how many records in db")
+			log.Println("dumping db records for debugging")
 
 			engine := query.NewEngine(memory.DefaultAllocator, database.TableProvider())
 			engine.ScanTable(tableName).
-				Aggregate(
-					[]logicalplan.Expr{
-						logicalplan.Max(logicalplan.Col("time_unix_nano")),
-						logicalplan.Count(logicalplan.Col("body_string")),
-					},
-					[]logicalplan.Expr{},
-				).
+				// Aggregate(
+				// 	[]logicalplan.Expr{
+				// 		logicalplan.Max(logicalplan.Col("time_unix_nano")),
+				// 		logicalplan.Count(logicalplan.Col("body_string")),
+				// 	},
+				// 	[]logicalplan.Expr{},
+				// ).
 				Execute(ctx, func(ctx context.Context, r arrow.Record) error {
 					fmt.Println(r)
 					return nil

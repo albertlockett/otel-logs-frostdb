@@ -7,6 +7,7 @@ import (
 	"github.com/polarsignals/frostdb"
 	"go.opentelemetry.io/collector/component"
 	"go.opentelemetry.io/collector/consumer"
+	"go.opentelemetry.io/collector/pdata/pcommon"
 	"go.opentelemetry.io/collector/pdata/plog"
 )
 
@@ -31,9 +32,11 @@ func (f *frostdbExporter) Capabilities() consumer.Capabilities {
 }
 
 type Record struct {
-	TimeUnixNano int64
-	BodyString   string
-	// AttributesKeyvalueString map[string]string
+	TimeUnixNano             int64
+	BodyString               string
+	AttributesKeyvalueString map[string]string
+	AttributesKeyvalueBool   map[string]bool
+	AttributesKeyvalueInt    map[string]int64
 }
 
 func (f *frostdbExporter) ConsumeLogs(ctx context.Context, logs plog.Logs) error {
@@ -59,12 +62,26 @@ func (f *frostdbExporter) ConsumeLogs(ctx context.Context, logs plog.Logs) error
 			scopedLogs := resourceLogs.ScopeLogs().At(j)
 			for k := 0; k < scopedLogs.LogRecords().Len(); k++ {
 				logRecord := scopedLogs.LogRecords().At(k)
-				log.Printf("%v", logRecord.Body())
 
 				record := Record{
-					TimeUnixNano: logRecord.Timestamp().AsTime().Unix(),
-					BodyString:   logRecord.Body().AsString(),
+					TimeUnixNano:             logRecord.Timestamp().AsTime().Unix(),
+					BodyString:               logRecord.Body().AsString(),
+					AttributesKeyvalueString: map[string]string{},
+					AttributesKeyvalueInt:    map[string]int64{},
+					AttributesKeyvalueBool:   map[string]bool{},
 				}
+
+				logRecord.Attributes().Range(func(k string, v pcommon.Value) bool {
+					switch v.Type() {
+					case pcommon.ValueTypeStr:
+						record.AttributesKeyvalueString[k] = v.AsString()
+					case pcommon.ValueTypeBool:
+						record.AttributesKeyvalueBool[k] = v.Bool()
+					case pcommon.ValueTypeInt:
+						record.AttributesKeyvalueInt[k] = v.Int()
+					}
+					return true
+				})
 
 				table.Write(ctx, record)
 			}
